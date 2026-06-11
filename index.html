@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>냉장고 레시피 추천</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="homeScreen" class="screen home-screen active">
+        <div class="hero-media">
+          <img src="assets/fridge-hero.png" alt="열린 냉장고와 신선한 재료" />
+          <div class="hero-overlay"></div>
+        </div>
+        <div class="home-content">
+          <h1>재료를 담고 빼면서 오늘의 메뉴를 찾아보세요</h1>
+          <p class="intro">
+            신선 재료부터 냉동만두, 냉동새우, 냉동볶음밥까지 골라서
+            바로 만들 수 있는 레시피를 추천받을 수 있습니다.
+          </p>
+          <button class="primary-button" id="startButton" type="button">
+            시작하기
+          </button>
+        </div>
+      </section>
+
+      <section id="selectScreen" class="screen">
+        <header class="top-bar">
+          <div>
+            <p class="eyebrow">재료 선택</p>
+            <h2>냉장고에 있는 재료를 골라주세요</h2>
+          </div>
+          <span class="counter" id="selectedCount">0개</span>
+        </header>
+
+        <section class="fridge-panel" aria-label="선택한 재료">
+          <div class="fridge-header">
+            <span>내 냉장고</span>
+            <div class="fridge-actions">
+              <button class="text-button" id="toggleFridgeButton" type="button">접기</button>
+              <button class="text-button" id="clearButton" type="button">비우기</button>
+            </div>
+          </div>
+          <div class="fridge-box" id="fridgeBox">
+            <p class="empty-state" id="emptyFridgeText">아직 담긴 재료가 없습니다.</p>
+          </div>
+        </section>
+
+        <section class="ingredient-panel" aria-label="재료 목록">
+          <div class="section-title-row">
+            <h3>재료 버튼</h3>
+            <p>검색하거나 분류를 골라 빠르게 찾아보세요</p>
+          </div>
+          <label class="search-field" for="ingredientSearch">
+            <span>재료 검색</span>
+            <input id="ingredientSearch" type="search" placeholder="예: 대파, 남은 치킨, 우동면" autocomplete="off" />
+          </label>
+          <div class="category-tabs" id="categoryTabs" aria-label="재료 카테고리"></div>
+          <p class="ingredient-count" id="ingredientCount"></p>
+          <div class="ingredient-grid" id="ingredientGrid"></div>
+        </section>
+
+        <button class="secondary-button block-action" id="openWriteButton" type="button">
+          내 레시피 올리기
+        </button>
+        <button class="secondary-button block-action compact-action" id="openRecipeSearchButton" type="button">
+          전체 레시피 검색 / 즐겨찾기
+        </button>
+        <button class="primary-button sticky-action" id="recommendButton" type="button">
+          레시피 추천하기
+        </button>
+      </section>
+
+      <section id="resultScreen" class="screen">
+        <header class="top-bar">
+          <button class="icon-button" id="backToSelectButton" type="button" aria-label="재료 선택으로 돌아가기">
+            &lt;
+          </button>
+          <div>
+            <p class="eyebrow">추천 결과</p>
+            <h2>지금 만들 수 있는 음식</h2>
+          </div>
+        </header>
+
+        <div class="selected-summary" id="selectedSummary"></div>
+        <label class="search-field recipe-search-field" for="recipeSearch">
+          <span>레시피 검색</span>
+          <input id="recipeSearch" type="search" placeholder="예: 치킨, 만두, 볶음밥" autocomplete="off" />
+        </label>
+        <p class="ingredient-count" id="recipeCount"></p>
+        <div class="result-tools">
+          <button class="secondary-button" id="showAllRecipesButton" type="button">전체 보기</button>
+          <button class="secondary-button" id="showFavoritesButton" type="button">즐겨찾기만</button>
+        </div>
+        <div class="filter-chips" id="resultFilters" aria-label="레시피 필터">
+          <button class="filter-chip active-filter" type="button" data-result-filter="all">전체</button>
+          <button class="filter-chip" type="button" data-result-filter="ready">바로 가능</button>
+          <button class="filter-chip" type="button" data-result-filter="missing1">부족 1개 이하</button>
+          <button class="filter-chip" type="button" data-result-filter="fast">10분 이내</button>
+          <button class="filter-chip" type="button" data-result-filter="delivery">남은 배달</button>
+          <button class="filter-chip" type="button" data-result-filter="frozen">냉동식품</button>
+          <button class="filter-chip" type="button" data-result-filter="rice">밥 요리</button>
+          <button class="filter-chip" type="button" data-result-filter="noodle">면 요리</button>
+          <button class="filter-chip" type="button" data-result-filter="snack">간식</button>
+        </div>
+        <div class="recipe-list" id="recipeList"></div>
+      </section>
+
+      <section id="writeScreen" class="screen">
+        <header class="top-bar">
+          <button class="icon-button" id="backFromWriteButton" type="button" aria-label="재료 선택으로 돌아가기">
+            &lt;
+          </button>
+          <div>
+            <p class="eyebrow">사용자 레시피</p>
+            <h2>내 레시피 올리기</h2>
+          </div>
+        </header>
+
+        <form class="recipe-form" id="recipeForm">
+          <label>
+            <span>작성자</span>
+            <input id="recipeAuthor" type="text" placeholder="닉네임" required />
+          </label>
+          <label>
+            <span>요리 이름</span>
+            <input id="recipeTitleInput" type="text" placeholder="예: 남은 치킨 김치볶음밥" required />
+          </label>
+          <label>
+            <span>한 줄 소개</span>
+            <input id="recipeDescriptionInput" type="text" placeholder="이 레시피의 매력을 짧게 적어주세요" required />
+          </label>
+          <label>
+            <span>필수 재료</span>
+            <input id="recipeRequiredInput" type="text" placeholder="예: 남은 치킨, 밥, 김치" required />
+          </label>
+          <label>
+            <span>선택 재료</span>
+            <input id="recipeOptionalInput" type="text" placeholder="예: 계란, 대파, 치즈" />
+          </label>
+          <label>
+            <span>대표 이미지</span>
+            <select id="recipePhotoInput">
+              <option value="assets/fridge-hero.png">냉장고 기본 이미지</option>
+              <option value="assets/recipe-photos/kimchi-fried-rice-exact.jpg">볶음밥 사진</option>
+              <option value="assets/recipe-photos/mandu-guk-exact.jpg">국물 요리 사진</option>
+              <option value="assets/recipe-photos/bibim-mandu-exact.jpg">만두/간식 사진</option>
+              <option value="assets/recipe-photos/nugget-rice-bowl.jpg">치킨/덮밥 사진</option>
+              <option value="assets/recipe-photos/tteok-mandu-ramyun.jpg">면/떡볶이 사진</option>
+            </select>
+          </label>
+          <div class="form-row">
+            <label>
+              <span>조리 시간</span>
+              <input id="recipeTimeInput" type="text" placeholder="15분" required />
+            </label>
+            <label>
+              <span>난이도</span>
+              <select id="recipeDifficultyInput">
+                <option>쉬움</option>
+                <option>보통</option>
+                <option>어려움</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            <span>조리 순서</span>
+            <textarea id="recipeStepsInput" rows="5" placeholder="한 줄에 한 단계씩 적어주세요" required></textarea>
+          </label>
+          <button class="primary-button" type="submit">게시하기</button>
+          <p class="form-note" id="recipeFormNote"></p>
+        </form>
+      </section>
+
+      <section id="detailScreen" class="screen">
+        <header class="top-bar">
+          <button class="icon-button" id="backToResultsButton" type="button" aria-label="추천 결과로 돌아가기">
+            &lt;
+          </button>
+          <div>
+            <p class="eyebrow">상세 보기</p>
+            <h2 id="detailTitle">레시피 상세</h2>
+          </div>
+        </header>
+
+        <article class="detail-card">
+          <div class="detail-photo-wrap">
+            <img class="detail-photo" id="detailPhoto" src="" alt="" />
+            <span class="detail-icon-badge" id="detailIcon"></span>
+          </div>
+          <p class="detail-description" id="detailDescription"></p>
+          <button class="secondary-button favorite-detail-button" id="detailFavoriteButton" type="button">
+            즐겨찾기 저장
+          </button>
+
+          <div class="meta-grid">
+            <div>
+              <span>조리 시간</span>
+              <strong id="detailTime"></strong>
+            </div>
+            <div>
+              <span>난이도</span>
+              <strong id="detailDifficulty"></strong>
+            </div>
+            <div>
+              <span>분량</span>
+              <strong id="detailServings"></strong>
+            </div>
+            <div class="wide-meta">
+              <span>준비 포인트</span>
+              <strong id="detailPrep"></strong>
+            </div>
+          </div>
+
+          <section class="detail-section">
+            <h3>필요한 재료와 대략적인 양</h3>
+            <div class="chip-row" id="detailIngredients"></div>
+          </section>
+
+          <section class="detail-section substitute-box">
+            <h3>대체 재료</h3>
+            <div class="chip-row" id="detailSubstitutes"></div>
+          </section>
+
+          <section class="detail-section">
+            <h3>조리 순서</h3>
+            <ol class="step-list" id="detailSteps"></ol>
+          </section>
+
+          <section class="detail-section tip-box">
+            <h3>맛있게 만드는 팁</h3>
+            <p id="detailTip"></p>
+          </section>
+
+          <section class="detail-section review-panel">
+            <div class="section-title-row">
+              <h3>리뷰</h3>
+              <p id="reviewCount">0개</p>
+            </div>
+            <div class="review-list" id="reviewList"></div>
+            <form class="review-form" id="reviewForm">
+              <div class="form-row">
+                <label>
+                  <span>닉네임</span>
+                  <input id="reviewAuthor" type="text" placeholder="맛잘알" required />
+                </label>
+                <label>
+                  <span>별점</span>
+                  <select id="reviewRating">
+                    <option value="5">5점</option>
+                    <option value="4">4점</option>
+                    <option value="3">3점</option>
+                    <option value="2">2점</option>
+                    <option value="1">1점</option>
+                  </select>
+                </label>
+              </div>
+              <textarea id="reviewText" rows="3" placeholder="만들어본 느낌이나 바꿔본 재료를 적어주세요" required></textarea>
+              <div class="review-actions">
+                <button class="secondary-button" id="reviewSubmitButton" type="submit">리뷰 남기기</button>
+                <button class="text-button" id="reviewCancelEditButton" type="button" hidden>수정 취소</button>
+              </div>
+            </form>
+          </section>
+        </article>
+      </section>
+
+      <nav class="bottom-nav" aria-label="주요 메뉴">
+        <button type="button" data-nav="recommend" class="active-nav">재료추천</button>
+        <button type="button" data-nav="search">전체검색</button>
+        <button type="button" data-nav="favorites">즐겨찾기 <span id="favoriteNavCount">0</span></button>
+        <button type="button" data-nav="write">작성</button>
+      </nav>
+    </main>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>

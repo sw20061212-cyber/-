@@ -1,0 +1,12 @@
+{
+  "name": "fridge-recipe-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx serve .",
+    "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "vercel": "^54.11.1"
+  }
+}
